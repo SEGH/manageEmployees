@@ -1,0 +1,24 @@
+{
+  "name": "manageemployees",
+  "version": "1.0.0",
+  "description": "A command-line app to manage employees",
+  "main": "manageEmployees.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SEGH/manageEmployees.git"
+  },
+  "author": "SEGH",
+  "license": "Unlicense",
+  "dependencies": {
+    "mysql": "^2.16.0",
+    "dotenv": "^8.2.0",
+    "inquirer": "^6.3.1"
+  },
+  "bugs": {
+    "url": "https://github.com/SEGH/manageEmployees/issues"
+  },
+  "homepage": "https://github.com/SEGH/manageEmployees#readme"
+}
