@@ -1,4 +1,8 @@
 // Dependencies
+const inquirer = require("inquirer");
+const mysql = require("mysql");
+const cTable = require("console.table");
+require("dotenv").config();
 
 // Database Connection
     // Call function that runs main inquirer prompts
