@@ -112,9 +112,7 @@ const runMain = () => {
                 // runViewEmployee();
                 break;
             case "UPDATE employee role":
-                console.log("Option unavailable, select another");
-                runMain();
-                // runUpdateEmployee();
+                runUpdateEmployee();
                 break;
             // If Exit is chosen, end connection
             case "EXIT":
@@ -150,8 +148,31 @@ const runAddEmployee = () => {
     });
 }
 
-// Function to run prompts needed to view departments, roles, and employees
+// Function to view all departments
+    // Call function to re-run main inquirer prompts again at end
+
+// Function to view all roles
+    // Call function to re-run main inquirer prompts again at end
+
+// Function to view all employees
     // Call function to re-run main inquirer prompts again at end
 
 // Function to run prompts needed to update employee roles
-    // Call function to re-run main inquirer prompts again at end
+const runUpdateEmployee = () => {
+    inquirer.prompt([
+        {
+            type: "input",
+            message: "Enter the id of the employee you'd like to update:",
+            name: "employeeId"
+        },
+        {
+            type: "input",
+            message: "Enter the role ID you'd like this employee to be associated with:",
+            name: "roleId"
+        }
+    ]).then(newData => {
+        console.log(newData);
+        // Call function to re-run main inquirer prompts again at end
+        runMain();
+    });
+}
