@@ -91,9 +91,7 @@ const runMain = () => {
                 runAddDept();
                 break;
             case "VIEW all departments":
-                console.log("Option unavailable, select another");
-                runMain();
-                // runViewDept();
+                runViewDept();
                 break;
             case "ADD role":
                 runAddRole();
@@ -149,6 +147,15 @@ const runAddEmployee = () => {
 }
 
 // Function to view all departments
+const runViewDept = () => {
+    connection.query("SELECT * FROM manageEmployeesDB.department", function (err, res) {
+        if (err) throw err;
+
+        console.log("------VIEWING ALL DEPARTMENTS------");
+        console.table(res);
+        runMain();
+    });
+}
     // Call function to re-run main inquirer prompts again at end
 
 // Function to view all roles
