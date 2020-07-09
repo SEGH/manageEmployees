@@ -86,7 +86,7 @@ const employeeQuestions = [
 // Function to run main inquirer prompts (choice list)
 const runMain = () => {
     inquirer.prompt(mainQuestions).then(choice => {
-        switch(choice.action){
+        switch (choice.action) {
             case "ADD department":
                 runAddDept();
                 break;
@@ -119,8 +119,20 @@ const runMain = () => {
 const runAddDept = () => {
     inquirer.prompt(departmentQuestions).then(deptRes => {
         console.log(deptRes);
-        // Call function to re-run main inquirer prompts again at end
-        runMain();
+        
+        // Write query to check if department name is already in database
+
+        connection.query("INSERT INTO department SET ?", 
+        {
+            name: deptRes.deptName
+        }, 
+        function (err, res) {
+            if (err) throw err;
+            console.log(res.affectedRows + " department added!");
+
+            // Call function to re-run main inquirer prompts again at end
+            runMain();
+        });
     });
 }
 
@@ -157,6 +169,7 @@ const runViewDept = () => {
 
 // Function to view all roles
 const runViewRole = () => {
+    // Need JOIN query to view department name
     connection.query("SELECT * FROM manageEmployeesDB.role", function (err, res) {
         if (err) throw err;
 
@@ -170,9 +183,9 @@ const runViewRole = () => {
 
 // Function to view all employees
 const runViewEmployee = () => {
-    connection.query("SELECT * FROM manageEmployeesDB.employee", function (err, res) {
+    // Need JOIN queries to view title, department name, salary, and manager name
+    connection.query("SELECT employee.id, employee.first_name, employee.last_name FROM manageEmployeesDB.employee", function (err, res) {
         if (err) throw err;
-
         console.log("------VIEWING ALL EMPLOYEES------");
         console.table(res);
 
