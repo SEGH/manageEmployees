@@ -22,6 +22,10 @@ connection.connect((err) => {
     runMain();
 });
 
+// Choice Arrays
+const departments = [];
+const roles = [];
+
 // Prompt Question Arrays
 const mainQuestions = [
     {
@@ -44,18 +48,18 @@ const roleQuestions = [
     {
         type: "input",
         message: "What is the role title?",
-        name: "roleTile"
+        name: "roleTitle"
     },
     {
         type: "input",
         message: "What is the salary for this role?",
         name: "roleSalary"
     },
-    // Update this prompt to a choice list of current departments in database
     {
-        type: "input",
-        message: "Which department is this role under? Enter the department's id",
-        name: "roleDept"
+        type: "list",
+        message: "Which department is this role under?",
+        name: "roleDept",
+        choices: departments
     }
 ];
 
@@ -148,10 +152,32 @@ const runAddDept = () => {
 
 // Function to run prompts needed to add roles
 const runAddRole = () => {
-    inquirer.prompt(roleQuestions).then(roleRes => {
-        console.log(roleRes);
-        // Call function to re-run main inquirer prompts again at end
-        runMain();
+    // Check what departments are in the database
+    connection.query("SELECT * FROM manageEmployeesDB.department", function (err, res) {
+        if (err) throw err;
+
+        for (let i = 0; i < res.length; i++) {
+            departments.push(res[i].name);
+        }
+
+        inquirer.prompt(roleQuestions).then(roleRes => {
+            connection.query("SELECT id FROM manageEmployeesDB.department WHERE name = ?", [roleRes.roleDept], function(err, res) {
+                if (err) throw err;
+
+                connection.query("INSERT INTO role SET ?",
+                {
+                    title: roleRes.roleTitle,
+                    salary: roleRes.roleSalary,
+                    department_id: res[0].id
+
+                }, function (err, res) {
+                    if (err) throw err;
+                    console.log(res.affectedRows + " role created!");
+                    // Call function to re-run main inquirer prompts again at end
+                    runMain();
+                });
+            });
+        });
     });
 }
 
