@@ -103,9 +103,7 @@ const runMain = () => {
                 runAddEmployee();
                 break;
             case "VIEW all employees":
-                console.log("Option unavailable, select another");
-                runMain();
-                // runViewEmployee();
+                runViewEmployee();
                 break;
             case "UPDATE employee role":
                 runUpdateEmployee();
@@ -171,7 +169,17 @@ const runViewRole = () => {
 }
 
 // Function to view all employees
-    // Call function to re-run main inquirer prompts again at end
+const runViewEmployee = () => {
+    connection.query("SELECT * FROM manageEmployeesDB.employee", function (err, res) {
+        if (err) throw err;
+
+        console.log("------VIEWING ALL EMPLOYEES------");
+        console.table(res);
+
+        // Call function to re-run main inquirer prompts again at end
+        runMain();
+    });
+}
 
 // Function to run prompts needed to update employee roles
 const runUpdateEmployee = () => {
