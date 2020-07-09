@@ -119,19 +119,29 @@ const runMain = () => {
 const runAddDept = () => {
     inquirer.prompt(departmentQuestions).then(deptRes => {
         console.log(deptRes);
-        
-        // Write query to check if department name is already in database
 
-        connection.query("INSERT INTO department SET ?", 
-        {
-            name: deptRes.deptName
-        }, 
-        function (err, res) {
+        // Query to check if department name is already in database
+        connection.query("SELECT name FROM manageEmployeesDB.department WHERE name = ?", [deptRes.deptName], function (err, res) {
             if (err) throw err;
-            console.log(res.affectedRows + " department added!");
 
-            // Call function to re-run main inquirer prompts again at end
-            runMain();
+            if (res.length === 0) {
+                // If not, create the department
+                connection.query("INSERT INTO department SET ?",
+                    {
+                        name: deptRes.deptName
+                    },
+                    function (err, res) {
+                        if (err) throw err;
+                        console.log(res.affectedRows + " department added!");
+
+                        // Call function to re-run main inquirer prompts again at end
+                        runMain();
+                    });
+            } else {
+                // If so, return back to main menu
+                console.log("Department already exists!")
+                runMain();
+            }
         });
     });
 }
