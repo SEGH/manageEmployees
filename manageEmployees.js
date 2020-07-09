@@ -22,6 +22,14 @@ connection.connect((err) => {
 });
 
 // Prompt Question Arrays
+const mainQuestions = [
+    {
+        type: "list",
+        message: "What task would you like to do?",
+        name: "action",
+        choices: ["ADD department", "VIEW all departments", "ADD role", "VIEW all roles", "ADD employee", "EXIT"]
+    }
+];
 
 // Function to run main inquirer prompts (choice list)
     // If Exit is chosen, end connection
