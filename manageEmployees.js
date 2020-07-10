@@ -255,7 +255,7 @@ const runViewDept = () => {
 
 // Function to view all roles
 const runViewRole = () => {
-    // Need JOIN query to view department name
+    // Need JOIN query to view department name instead of id ////TODO!!////
     connection.query("SELECT * FROM manageEmployeesDB.role", function (err, res) {
         if (err) throw err;
 
@@ -269,7 +269,7 @@ const runViewRole = () => {
 
 // Function to view all employees
 const runViewEmployee = () => {
-    // Need JOIN queries to view title, department name, salary, and manager name
+    // Need JOIN queries to view title, department name, salary, and manager name ////TODO!!////
     connection.query("SELECT employee.id, employee.first_name, employee.last_name FROM manageEmployeesDB.employee", function (err, res) {
         if (err) throw err;
         console.log("------VIEWING ALL EMPLOYEES------");
@@ -282,18 +282,23 @@ const runViewEmployee = () => {
 
 // Function to run prompts needed to update employee roles
 const runUpdateEmployee = () => {
+    // Need to run connection query to check current employees in database and list in prompt ////TODO!!////
+    // Then run connection query to check current roles in database and list in prompt ////TODO!!////
     inquirer.prompt([
         {
-            type: "input",
-            message: "Enter the id of the employee you'd like to update:",
-            name: "employeeId"
+            type: "list",
+            message: "Select an employee to update",
+            name: "fullName",
+            choices: employees
         },
         {
             type: "input",
-            message: "Enter the role ID you'd like this employee to be associated with:",
-            name: "roleId"
+            message: "Select a new role for this employee",
+            name: "newRole",
+            choices: roles
         }
     ]).then(newData => {
+        // connection query to insert role_id where employee name is first and last ////TODO!!////
         console.log(newData);
         // Call function to re-run main inquirer prompts again at end
         runMain();
