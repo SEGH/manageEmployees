@@ -25,6 +25,7 @@ connection.connect((err) => {
 // Choice Arrays
 const departments = [];
 const roles = [];
+const employees = [];
 
 // Prompt Question Arrays
 const mainQuestions = [
@@ -73,17 +74,6 @@ const employeeQuestions = [
         type: "input",
         message: "Enter the employee's last name: ",
         name: "lastName"
-    },
-    // Update following two prompts to choice lists of current data in db
-    {
-        type: "input",
-        message: "What is this employee's role? Enter the role ID",
-        name: "employeeRole"
-    },
-    {
-        type: "input",
-        message: "Who is this employee's manager? Enter the manger's ID",
-        name: "employeeManager"
     }
 ];
 
@@ -161,21 +151,21 @@ const runAddRole = () => {
         }
 
         inquirer.prompt(roleQuestions).then(roleRes => {
-            connection.query("SELECT id FROM manageEmployeesDB.department WHERE name = ?", [roleRes.roleDept], function(err, res) {
+            connection.query("SELECT id FROM manageEmployeesDB.department WHERE name = ?", [roleRes.roleDept], function (err, res) {
                 if (err) throw err;
 
                 connection.query("INSERT INTO role SET ?",
-                {
-                    title: roleRes.roleTitle,
-                    salary: roleRes.roleSalary,
-                    department_id: res[0].id
+                    {
+                        title: roleRes.roleTitle,
+                        salary: roleRes.roleSalary,
+                        department_id: res[0].id
 
-                }, function (err, res) {
-                    if (err) throw err;
-                    console.log(res.affectedRows + " role created!");
-                    // Call function to re-run main inquirer prompts again at end
-                    runMain();
-                });
+                    }, function (err, res) {
+                        if (err) throw err;
+                        console.log(res.affectedRows + " role created!");
+                        // Call function to re-run main inquirer prompts again at end
+                        runMain();
+                    });
             });
         });
     });
@@ -184,9 +174,69 @@ const runAddRole = () => {
 // Function to run prompts needed to add employees
 const runAddEmployee = () => {
     inquirer.prompt(employeeQuestions).then(employeeRes => {
-        console.log(employeeRes);
-        // Call function to re-run main inquirer prompts again at end
-        runMain();
+        // Check roles in database
+        connection.query("SELECT * FROM manageEmployeesDB.role", function (err, res) {
+            if (err) throw err;
+
+            for (let i = 0; i < res.length; i++) {
+                roles.push(res[i].title);
+            }
+
+            inquirer.prompt([
+                {
+                    type: "list",
+                    message: "What is this employee's role?",
+                    name: "employeeRole",
+                    choices: roles
+                }
+            ]).then(employeeRole => {
+                connection.query("SELECT id FROM manageEmployeesDB.role WHERE title = ?", [employeeRole.employeeRole], function (err, res) {
+                    if (err) throw err;
+                    console.log(employeeRes);
+                    console.log(res);
+                    let roleID = res[0].id;
+                    connection.query("SELECT * FROM manageEmployeesDB.employee", function (err, res) {
+                        if (err) throw err;
+
+                        for (let i = 0; i < res.length; i++) {
+                            let fullName = `${res[i].first_name} ${res[i].last_name}`;
+                            employees.push(fullName);
+                        }
+
+                        inquirer.prompt([
+                            {
+                                type: "list",
+                                message: "Who is this employee's manager?",
+                                name: "employeeManager",
+                                choices: employees
+                            }
+                        ]).then(managerName => {
+                            let nameArray = managerName.employeeManager.split(" ");
+                            let first = nameArray[0];
+                            let last = nameArray[1];
+                            connection.query("SELECT id FROM manageEmployeesDB.employee WHERE first_name = ? AND last_name = ?", [first, last], function (err, res) {
+                                if (err) throw err;
+
+                                connection.query("INSERT INTO employee SET ?",
+                                    {
+                                        first_name: employeeRes.firstName,
+                                        last_name: employeeRes.lastName,
+                                        role_id: roleID,
+                                        manager_id: res[0].id
+
+                                    }, function (err, res) {
+                                        if (err) throw err;
+                                        console.log(res.affectedRows + " employee created!");
+                                        // Call function to re-run main inquirer prompts again at end
+                                        runMain();
+                                    });
+                            });
+                        });
+                    });
+                });
+            });
+
+        });
     });
 }
 
