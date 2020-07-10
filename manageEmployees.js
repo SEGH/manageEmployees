@@ -255,10 +255,10 @@ const runViewDept = () => {
 
 // Function to view all roles
 const runViewRole = () => {
-    // Need JOIN query to view department name instead of id ////TODO!!////
-    connection.query("SELECT * FROM manageEmployeesDB.role", function (err, res) {
+    connection.query("SELECT role.id, role.title, role.salary, department.name FROM role INNER JOIN department ON role.department_id = department.id", function (err, res) {
         if (err) throw err;
 
+        //// TODO!!/// Need to use console.table to display different column titles
         console.log("------VIEWING ALL ROLES------");
         console.table(res);
 
