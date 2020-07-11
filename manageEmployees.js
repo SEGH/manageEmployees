@@ -280,6 +280,7 @@ const runViewDept = () => {
 
         // Call function to re-run main inquirer prompts again at end
         runMain();
+
     });
 }
 
@@ -288,10 +289,15 @@ const runViewRole = () => {
     connection.query("SELECT role.id, role.title, role.salary, department.name AS department FROM role INNER JOIN department ON role.department_id = department.id", function (err, res) {
         if (err) throw err;
 
-        console.table("------   VIEWING ALL ROLES   ------", res);
+        if (res.length === 0) {
+            console.table("No Roles Created");
+            runMain();
+        } else {
+            console.table("------   VIEWING ALL ROLES   ------", res);
 
-        // Call function to re-run main inquirer prompts again at end
-        runMain();
+            // Call function to re-run main inquirer prompts again at end
+            runMain();
+        }
     });
 }
 
@@ -299,10 +305,16 @@ const runViewRole = () => {
 const runViewEmployee = () => {
     connection.query("SELECT A.id, A.first_name, A.last_name, role.title, role.salary, department.name AS department, CONCAT(B.first_name, ' ', B.last_name) AS manager FROM employee A LEFT JOIN employee B ON A.manager_id = B.id INNER JOIN role ON A.role_id = role.id INNER JOIN department ON role.department_id = department.id;", function (err, res) {
         if (err) throw err;
-        console.table("------   VIEWING ALL EMPLOYEES   ------", res);
 
-        // Call function to re-run main inquirer prompts again at end
-        runMain();
+        if (res.length === 0) {
+            console.table("No Employees Created");
+            runMain();
+        } else {
+            console.table("------   VIEWING ALL EMPLOYEES   ------", res);
+
+            // Call function to re-run main inquirer prompts again at end
+            runMain();
+        }
     });
 }
 
