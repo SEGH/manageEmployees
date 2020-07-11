@@ -245,8 +245,7 @@ const runViewDept = () => {
     connection.query("SELECT * FROM manageEmployeesDB.department", function (err, res) {
         if (err) throw err;
 
-        console.log("------VIEWING ALL DEPARTMENTS------");
-        console.table(res);
+        console.table("------VIEWING ALL DEPARTMENTS------", res);
 
         // Call function to re-run main inquirer prompts again at end
         runMain();
@@ -267,11 +266,9 @@ const runViewRole = () => {
 
 // Function to view all employees
 const runViewEmployee = () => {
-    // Need JOIN queries to view title, department name, salary, and manager name ////TODO!!////
-    connection.query("SELECT employee.id, employee.first_name, employee.last_name FROM manageEmployeesDB.employee", function (err, res) {
+    connection.query("SELECT A.id, A.first_name, A.last_name, role.title, role.salary, department.name AS department, CONCAT(B.first_name, ' ', B.last_name) AS manager FROM employee A LEFT JOIN employee B ON A.manager_id = B.id INNER JOIN role ON A.role_id = role.id INNER JOIN department ON role.department_id = department.id;", function (err, res) {
         if (err) throw err;
-        console.log("------VIEWING ALL EMPLOYEES------");
-        console.table(res);
+        console.table("------   VIEWING ALL EMPLOYEES   ------", res);
 
         // Call function to re-run main inquirer prompts again at end
         runMain();
