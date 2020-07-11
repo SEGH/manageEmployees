@@ -310,47 +310,52 @@ const runUpdateEmployee = () => {
     connection.query("SELECT id, CONCAT(first_name, ' ', last_name) AS names FROM employee;", function (err, res) {
         if (err) throw err;
 
-        for (let i = 0; i < res.length; i++) {
-            employees.push(res[i].names);
-        }
-
-        inquirer.prompt([
-            {
-                type: "list",
-                message: "Select an employee to update",
-                name: "fullName",
-                choices: employees
+        if (res.length === 0) {
+            console.log("There are no employees to update");
+            runMain();
+        } else {
+            for (let i = 0; i < res.length; i++) {
+                employees.push(res[i].names);
             }
-        ]).then(selectedEmployee => {
-            let employeeDataArray = res.filter(obj => obj.names === selectedEmployee.fullName);
-            let selectedID = employeeDataArray[0].id;
-            // Then run connection query to check current roles in database and list in prompt
-            connection.query("SELECT id, title FROM role;", function (err, res) {
-                if (err) throw err;
 
-                for (let i = 0; i < res.length; i++) {
-                    roles.push(res[i].title);
+            inquirer.prompt([
+                {
+                    type: "list",
+                    message: "Select an employee to update",
+                    name: "fullName",
+                    choices: employees
                 }
+            ]).then(selectedEmployee => {
+                let employeeDataArray = res.filter(obj => obj.names === selectedEmployee.fullName);
+                let selectedID = employeeDataArray[0].id;
+                // Then run connection query to check current roles in database and list in prompt
+                connection.query("SELECT id, title FROM role;", function (err, res) {
+                    if (err) throw err;
 
-                inquirer.prompt([
-                    {
-                        type: "list",
-                        message: "Select a new role for this employee",
-                        name: "newRole",
-                        choices: roles
+                    for (let i = 0; i < res.length; i++) {
+                        roles.push(res[i].title);
                     }
-                ]).then(newRole => {
-                    let roleDataArray = res.filter(obj => obj.title === newRole.newRole);
-                    let selectedRoleID = roleDataArray[0].id;
-                    // connection query to update role_id where employee id matches from selected
-                    connection.query("UPDATE employee SET role_id = ? WHERE id = ?", [selectedRoleID, selectedID], function (err, res) {
-                        if (err) throw err;
 
-                        console.log(res.affectedRows + " employee updated!");
-                        runMain();
+                    inquirer.prompt([
+                        {
+                            type: "list",
+                            message: "Select a new role for this employee",
+                            name: "newRole",
+                            choices: roles
+                        }
+                    ]).then(newRole => {
+                        let roleDataArray = res.filter(obj => obj.title === newRole.newRole);
+                        let selectedRoleID = roleDataArray[0].id;
+                        // connection query to update role_id where employee id matches from selected
+                        connection.query("UPDATE employee SET role_id = ? WHERE id = ?", [selectedRoleID, selectedID], function (err, res) {
+                            if (err) throw err;
+
+                            console.log(res.affectedRows + " employee updated!");
+                            runMain();
+                        });
                     });
                 });
             });
-        });
+        }
     });
 }
