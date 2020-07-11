@@ -23,7 +23,7 @@ connection.connect((err) => {
 });
 
 // Choice Arrays
-const departments = [];
+let departments = [];
 const roles = [];
 const employees = [];
 
@@ -150,6 +150,7 @@ const runAddDept = () => {
 
 // Function to run prompts needed to add roles
 const runAddRole = () => {
+    departments.length = 0;
     // Check what departments are in the database
     connection.query("SELECT * FROM manageEmployeesDB.department", function (err, res) {
         if (err) throw err;
@@ -181,7 +182,8 @@ const runAddRole = () => {
 
 // Function to run prompts needed to add employees
 const runAddEmployee = () => {
-
+    roles.length = 0;
+    employees.length = 0;
     inquirer.prompt(employeeQuestions).then(employeeRes => {
         // Check roles in database
         connection.query("SELECT * FROM manageEmployeesDB.role", function (err, res) {
