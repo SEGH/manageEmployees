@@ -277,8 +277,8 @@ const runViewEmployee = () => {
 
 // Function to run prompts needed to update employee roles
 const runUpdateEmployee = () => {
-    // Need to run connection query to check current employees in database and list in prompt ////TODO!!////
-    connection.query("SELECT CONCAT(first_name, ' ', last_name) AS names FROM employee;", function (err, res) {
+    // Need to run connection query to check current employees in database and list in prompt
+    connection.query("SELECT id, CONCAT(first_name, ' ', last_name) AS names FROM employee;", function (err, res) {
         if (err) throw err;
 
         for (let i = 0; i < res.length; i++) {
@@ -293,8 +293,10 @@ const runUpdateEmployee = () => {
                 choices: employees
             }
         ]).then(selectedEmployee => {
+            let employeeDataArray = res.filter(obj => obj.names === selectedEmployee.fullName);
+            let selectedID = employeeDataArray[0].id;
             // Then run connection query to check current roles in database and list in prompt
-            connection.query("SELECT title FROM role;", function (err, res) {
+            connection.query("SELECT id, title FROM role;", function (err, res) {
                 if (err) throw err;
 
                 for (let i = 0; i < res.length; i++) {
@@ -309,10 +311,15 @@ const runUpdateEmployee = () => {
                         choices: roles
                     }
                 ]).then(newRole => {
-                    // connection query to insert role_id where employee name is first and last ////TODO!!////
-                    console.log(selectedEmployee);
-                    console.log(newRole);
-                    runMain();
+                    let roleDataArray = res.filter(obj => obj.title === newRole.newRole);
+                    let selectedRoleID = roleDataArray[0].id;
+                    // connection query to update role_id where employee id matches from selected
+                    connection.query("UPDATE employee SET role_id = ? WHERE id = ?", [selectedRoleID, selectedID], function (err, res) {
+                        if (err) throw err;
+
+                        console.log(res.affectedRows + " employee updated!");
+                        runMain();
+                    });
                 });
             });
         });
