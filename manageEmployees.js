@@ -258,9 +258,7 @@ const runViewRole = () => {
     connection.query("SELECT role.id, role.title, role.salary, department.name AS department FROM role INNER JOIN department ON role.department_id = department.id", function (err, res) {
         if (err) throw err;
 
-        //// TODO!!/// Need to use console.table to display different column titles
-        console.log("------VIEWING ALL ROLES------");
-        console.table(res);
+        console.table("------   VIEWING ALL ROLES   ------", res);
 
         // Call function to re-run main inquirer prompts again at end
         runMain();
