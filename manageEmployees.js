@@ -255,7 +255,7 @@ const runViewDept = () => {
 
 // Function to view all roles
 const runViewRole = () => {
-    connection.query("SELECT role.id, role.title, role.salary, department.name FROM role INNER JOIN department ON role.department_id = department.id", function (err, res) {
+    connection.query("SELECT role.id, role.title, role.salary, department.name AS department FROM role INNER JOIN department ON role.department_id = department.id", function (err, res) {
         if (err) throw err;
 
         //// TODO!!/// Need to use console.table to display different column titles
