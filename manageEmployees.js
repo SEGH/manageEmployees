@@ -202,6 +202,7 @@ const runAddEmployee = () => {
                             let fullName = `${res[i].first_name} ${res[i].last_name}`;
                             employees.push(fullName);
                         }
+                        employees.push("This employee does not have a manager");
 
                         inquirer.prompt([
                             {
@@ -211,18 +212,12 @@ const runAddEmployee = () => {
                                 choices: employees
                             }
                         ]).then(managerName => {
-                            let nameArray = managerName.employeeManager.split(" ");
-                            let first = nameArray[0];
-                            let last = nameArray[1];
-                            connection.query("SELECT id FROM manageEmployeesDB.employee WHERE first_name = ? AND last_name = ?", [first, last], function (err, res) {
-                                if (err) throw err;
-
+                            if (managerName.employeeManager === "This employee does not have a manager") {
                                 connection.query("INSERT INTO employee SET ?",
                                     {
                                         first_name: employeeRes.firstName,
                                         last_name: employeeRes.lastName,
-                                        role_id: roleID,
-                                        manager_id: res[0].id
+                                        role_id: roleID
 
                                     }, function (err, res) {
                                         if (err) throw err;
@@ -230,7 +225,28 @@ const runAddEmployee = () => {
                                         // Call function to re-run main inquirer prompts again at end
                                         runMain();
                                     });
-                            });
+                            } else {
+                                let nameArray = managerName.employeeManager.split(" ");
+                                let first = nameArray[0];
+                                let last = nameArray[1];
+                                connection.query("SELECT id FROM manageEmployeesDB.employee WHERE first_name = ? AND last_name = ?", [first, last], function (err, res) {
+                                    if (err) throw err;
+
+                                    connection.query("INSERT INTO employee SET ?",
+                                        {
+                                            first_name: employeeRes.firstName,
+                                            last_name: employeeRes.lastName,
+                                            role_id: roleID,
+                                            manager_id: res[0].id
+
+                                        }, function (err, res) {
+                                            if (err) throw err;
+                                            console.log(res.affectedRows + " employee created!");
+                                            // Call function to re-run main inquirer prompts again at end
+                                            runMain();
+                                        });
+                                });
+                            }
                         });
                     });
                 });
