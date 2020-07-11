@@ -278,24 +278,43 @@ const runViewEmployee = () => {
 // Function to run prompts needed to update employee roles
 const runUpdateEmployee = () => {
     // Need to run connection query to check current employees in database and list in prompt ////TODO!!////
-    // Then run connection query to check current roles in database and list in prompt ////TODO!!////
-    inquirer.prompt([
-        {
-            type: "list",
-            message: "Select an employee to update",
-            name: "fullName",
-            choices: employees
-        },
-        {
-            type: "input",
-            message: "Select a new role for this employee",
-            name: "newRole",
-            choices: roles
+    connection.query("SELECT CONCAT(first_name, ' ', last_name) AS names FROM employee;", function (err, res) {
+        if (err) throw err;
+
+        for (let i = 0; i < res.length; i++) {
+            employees.push(res[i].names);
         }
-    ]).then(newData => {
-        // connection query to insert role_id where employee name is first and last ////TODO!!////
-        console.log(newData);
-        // Call function to re-run main inquirer prompts again at end
-        runMain();
+
+        inquirer.prompt([
+            {
+                type: "list",
+                message: "Select an employee to update",
+                name: "fullName",
+                choices: employees
+            }
+        ]).then(selectedEmployee => {
+            // Then run connection query to check current roles in database and list in prompt
+            connection.query("SELECT title FROM role;", function (err, res) {
+                if (err) throw err;
+
+                for (let i = 0; i < res.length; i++) {
+                    roles.push(res[i].title);
+                }
+
+                inquirer.prompt([
+                    {
+                        type: "list",
+                        message: "Select a new role for this employee",
+                        name: "newRole",
+                        choices: roles
+                    }
+                ]).then(newRole => {
+                    // connection query to insert role_id where employee name is first and last ////TODO!!////
+                    console.log(selectedEmployee);
+                    console.log(newRole);
+                    runMain();
+                });
+            });
+        });
     });
 }
