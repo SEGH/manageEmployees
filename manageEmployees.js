@@ -36,6 +36,7 @@ connection.connect((err) => {
 let departments = [];
 const roles = [];
 const employees = [];
+let managers = [];
 
 // Prompt Question Arrays
 const mainQuestions = [
@@ -43,7 +44,7 @@ const mainQuestions = [
         type: "list",
         message: "What task would you like to do?",
         name: "action",
-        choices: ["ADD department", "VIEW all departments", "ADD role", "VIEW all roles", "ADD employee", "VIEW all employees", "UPDATE employee role", "UPDATE employee manager", "EXIT"]
+        choices: ["ADD department", "VIEW all departments", "ADD role", "VIEW all roles", "ADD employee", "VIEW all employees", "VIEW employees by manager", "UPDATE employee role", "UPDATE employee manager", "EXIT"]
     }
 ];
 
@@ -129,6 +130,9 @@ const runMain = () => {
                         break;
                     case "VIEW all employees":
                         runViewEmployee();
+                        break;
+                    case "VIEW employees by manager":
+                        viewByManager();
                         break;
                     case "UPDATE employee role":
                         runUpdateEmployee();
@@ -462,6 +466,46 @@ const runUpdateManager = () => {
                     });
                 }
             });
+        }
+    });
+}
+
+// Function to view employees by manager
+const viewByManager = () => {
+    managers.length = 0;
+    connection.query("SELECT DISTINCT B.id, CONCAT(B.first_name, ' ', B.last_name) AS managers FROM employee A JOIN employee B ON A.manager_id = B.id", function (err, res) {
+        if (err) throw err;
+
+        if (res.length === 0) {
+            console.log("───────────────────────────────────────────────");
+            console.log("There are no managers");
+            runMain();
+        } else {
+            for (let i = 0; i < res.length; i++) {
+                managers.push(res[i].managers);
+            }
+
+            inquirer.prompt([
+                {
+                    type: "list",
+                    message: "Select a manager to view their employees",
+                    name: "managerName",
+                    choices: managers
+                }
+            ]).then(manager => {
+                let managerDataArray = res.filter(obj => obj.managers === manager.managerName);
+                let managerID = managerDataArray[0].id;
+
+                connection.query("SELECT employee.id, employee.first_name, employee.last_name, department.name AS department, role.title FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id WHERE manager_id = ?", [managerID], function (err, res) {
+                    if (err) throw err;
+
+                    console.log("───────────────────────────────────────────────");
+                    console.table(`──────────── ${manager.managerName}'s EMPLOYEES ────────────`, res);
+
+                    runMain();
+                });
+            });
+
         }
     });
 }
