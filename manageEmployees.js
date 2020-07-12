@@ -436,25 +436,31 @@ const runUpdateManager = () => {
 
                 let managerArray = employees.filter(employee => employee != selectedEmployee.fullName);
 
-                inquirer.prompt([
-                    {
-                        type: "list",
-                        message: "Select a new manager for this employee",
-                        name: "newManager",
-                        choices: managerArray
-                    }
-                ]).then(newManager => {
-                    let managerDataArray = res.filter(obj => obj.names === newManager.newManager);
-                    let newManagerID = managerDataArray[0].id;
-                    console.log(employeeID, newManagerID);
-                    connection.query("UPDATE employee SET manager_id = ? WHERE id = ?", [newManagerID, employeeID], function(err, res) {
-                        if (err) throw err;
+                if (managerArray.length === 0) {
+                    console.log("───────────────────────────────────────────────");
+                    console.log(`${selectedEmployee.fullName} cannot be their own manager`);
+                    runMain();
+                } else {
+                    inquirer.prompt([
+                        {
+                            type: "list",
+                            message: "Select a new manager for this employee",
+                            name: "newManager",
+                            choices: managerArray
+                        }
+                    ]).then(newManager => {
+                        let managerDataArray = res.filter(obj => obj.names === newManager.newManager);
+                        let newManagerID = managerDataArray[0].id;
+                        console.log(employeeID, newManagerID);
+                        connection.query("UPDATE employee SET manager_id = ? WHERE id = ?", [newManagerID, employeeID], function (err, res) {
+                            if (err) throw err;
 
-                        console.log("───────────────────────────────────────────────");
-                        console.log(`${selectedEmployee.fullName}'s manager has been updated to ${newManager.newManager}`);
-                        runMain();
+                            console.log("───────────────────────────────────────────────");
+                            console.log(`${selectedEmployee.fullName}'s manager has been updated to ${newManager.newManager}`);
+                            runMain();
+                        });
                     });
-                });
+                }
             });
         }
     });
