@@ -4,6 +4,7 @@
   "description": "A command-line app to manage employees",
   "main": "manageEmployees.js",
   "scripts": {
+    "start": "node manageEmployees.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
