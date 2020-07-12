@@ -304,7 +304,7 @@ const runAddEmployee = () => {
 
 // Function to view all departments
 const runViewDept = () => {
-    connection.query("SELECT department.id, department.name, SUM(role.salary) AS utilized_budget FROM department JOIN role ON role.department_id = department.id JOIN employee ON employee.role_id = role.id GROUP BY department.id", function (err, res) {
+    connection.query("SELECT * FROM department", function (err, res) {
         if (err) throw err;
 
         console.log("───────────────────────────────────────────────");
