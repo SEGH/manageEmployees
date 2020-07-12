@@ -43,7 +43,7 @@ const mainQuestions = [
         type: "list",
         message: "What task would you like to do?",
         name: "action",
-        choices: ["ADD department", "VIEW all departments", "ADD role", "VIEW all roles", "ADD employee", "VIEW all employees", "UPDATE employee role", "EXIT"]
+        choices: ["ADD department", "VIEW all departments", "ADD role", "VIEW all roles", "ADD employee", "VIEW all employees", "UPDATE employee role", "UPDATE employee manager", "EXIT"]
     }
 ];
 
@@ -133,6 +133,9 @@ const runMain = () => {
                     case "UPDATE employee role":
                         runUpdateEmployee();
                         break;
+                    case "UPDATE employee manager":
+                        runUpdateManager();
+                        break;
                     // If Exit is chosen, end connection
                     case "EXIT":
                         connection.end();
@@ -201,7 +204,7 @@ const runAddRole = () => {
                     }, function (err, res) {
                         if (err) throw err;
                         console.log("───────────────────────────────────────────────");
-                        console.log(roleRes.roleTitle + " role created with an id of " + res.insertId +  " in the " + roleRes.roleDept + " department!");
+                        console.log(roleRes.roleTitle + " role created with an id of " + res.insertId + " in the " + roleRes.roleDept + " department!");
                         // Call function to re-run main inquirer prompts again at end
                         runMain();
                     });
@@ -397,6 +400,59 @@ const runUpdateEmployee = () => {
                             console.log(`${selectedEmployee.fullName}'s role has been updated to a ${newRole.newRole}`);
                             runMain();
                         });
+                    });
+                });
+            });
+        }
+    });
+}
+
+const runUpdateManager = () => {
+    employees.length = 0;
+    roles.length = 0;
+    // Need to run connection query to check current employees in database and list in prompt
+    connection.query("SELECT id, CONCAT(first_name, ' ', last_name) AS names FROM employee;", function (err, res) {
+        if (err) throw err;
+
+        if (res.length === 0) {
+            console.log("───────────────────────────────────────────────");
+            console.log("There are no employees to update");
+            runMain();
+        } else {
+            for (let i = 0; i < res.length; i++) {
+                employees.push(res[i].names);
+            }
+
+            inquirer.prompt([
+                {
+                    type: "list",
+                    message: "Select an employee to update",
+                    name: "fullName",
+                    choices: employees
+                }
+            ]).then(selectedEmployee => {
+                let employeeDataArray = res.filter(obj => obj.names === selectedEmployee.fullName);
+                let employeeID = employeeDataArray[0].id;
+
+                let managerArray = employees.filter(employee => employee != selectedEmployee.fullName);
+
+                inquirer.prompt([
+                    {
+                        type: "list",
+                        message: "Select a new manager for this employee",
+                        name: "newManager",
+                        choices: managerArray
+                    }
+                ]).then(newManager => {
+                    let managerDataArray = res.filter(obj => obj.names === newManager.newManager);
+                    let newManagerID = managerDataArray[0].id;
+                    console.log(employeeID, newManagerID);
+                    connection.query("UPDATE employee SET manager_id = ? WHERE id = ?", [newManagerID, employeeID], function(err, res) {
+                        if (err) throw err;
+
+                        console.log("───────────────────────────────────────────────");
+                        console.log(`${selectedEmployee.fullName}'s manager has been updated to ${newManager.newManager}`);
+                        runMain();
                     });
                 });
             });
