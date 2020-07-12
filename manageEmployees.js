@@ -44,7 +44,7 @@ const mainQuestions = [
         type: "list",
         message: "What task would you like to do?",
         name: "action",
-        choices: ["ADD department", "VIEW all departments", "ADD role", "VIEW all roles", "ADD employee", "VIEW all employees", "VIEW employees by manager", "UPDATE employee role", "UPDATE employee manager", "EXIT"]
+        choices: ["ADD department", "VIEW all departments", "ADD role", "VIEW all roles", "ADD employee", "VIEW all employees", "VIEW employees by manager", "UPDATE employee role", "UPDATE employee manager", "REMOVE employee", "EXIT"]
     }
 ];
 
@@ -139,6 +139,9 @@ const runMain = () => {
                         break;
                     case "UPDATE employee manager":
                         runUpdateManager();
+                        break;
+                    case "REMOVE employee":
+                        removeEmployee();
                         break;
                     // If Exit is chosen, end connection
                     case "EXIT":
@@ -506,6 +509,51 @@ const viewByManager = () => {
                 });
             });
 
+        }
+    });
+}
+
+// Function to delete employee from database
+const removeEmployee = () => {
+    console.log("───────────────────────────────────────────────");
+    console.log("WARNING: REMOVAL CANNOT BE REVERSED");
+    employees.length = 0;
+    connection.query("SELECT id, CONCAT(first_name, ' ', last_name) AS names FROM employee", function (err, res) {
+        if (err) throw err;
+
+        if (res.length === 0) {
+            console.log("───────────────────────────────────────────────");
+            console.log("There are no employees to remove");
+            runMain();
+        } else {
+            for (let i = 0; i < res.length; i++) {
+                employees.push(res[i].names);
+            }
+
+            employees.push("NONE, return to MAIN MENU");
+
+            inquirer.prompt([
+                {
+                    type: "list",
+                    message: "Select an employee to remove",
+                    name: "fullName",
+                    choices: employees
+                }
+            ]).then(selectedEmployee => {
+                if (selectedEmployee.fullName === "NONE, return to MAIN MENU") {
+                    runMain();
+                } else {
+                    let employeeDataArray = res.filter(obj => obj.names === selectedEmployee.fullName);
+                    let selectedID = employeeDataArray[0].id;
+                    connection.query("DELETE FROM employee WHERE id = ?", [selectedID], function (err, res) {
+                        if (err) throw err;
+
+                        console.log("───────────────────────────────────────────────");
+                        console.log(`${selectedEmployee.fullName} has been removed`);
+                        runMain();
+                    });
+                }
+            });
         }
     });
 }
