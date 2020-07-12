@@ -18,6 +18,16 @@ connection.connect((err) => {
 
     console.log("Connected as id " + connection.threadId);
 
+    console.log("─────────────────WELCOME TO────────────────────");
+    console.log("──────────────────╔═══╗─────╔╗");
+    console.log("──────────────────║╔══╝─────║║");
+    console.log("╔╗╔╦══╦═╗╔══╦══╦══╣╚══╦╗╔╦══╣║╔══╦╗─╔╦══╦══╦══╗");
+    console.log("║╚╝║╔╗║╔╗╣╔╗║╔╗║║═╣╔══╣╚╝║╔╗║║║╔╗║║─║║║═╣║═╣══╣");
+    console.log("║║║║╔╗║║║║╔╗║╚╝║║═╣╚══╣║║║╚╝║╚╣╚╝║╚═╝║║═╣║═╬══║");
+    console.log("╚╩╩╩╝╚╩╝╚╩╝╚╩═╗╠══╩═══╩╩╩╣╔═╩═╩══╩═╗╔╩══╩══╩══╝");
+    console.log("────────────╔═╝║─────────║║──────╔═╝║");
+    console.log("────────────╚══╝─────────╚╝──────╚══╝");
+    console.log("────────YOUR EMPLOYEE MANAGEMENT SYSTEM────────");
     // Call function that runs main inquirer prompts
     runMain();
 });
@@ -97,6 +107,7 @@ const runMain = () => {
             runAddDept();
         }
         else {
+            console.log("───────────────────────────────────────────────");
             inquirer.prompt(mainQuestions).then(choice => {
                 switch (choice.action) {
                     case "ADD department":
@@ -131,6 +142,7 @@ const runMain = () => {
 
 // Function to run prompts needed to add departments
 const runAddDept = () => {
+    console.log("───────────────────────────────────────────────");
     inquirer.prompt(departmentQuestions).then(deptRes => {
         console.log(deptRes);
 
@@ -162,6 +174,7 @@ const runAddDept = () => {
 
 // Function to run prompts needed to add roles
 const runAddRole = () => {
+    console.log("───────────────────────────────────────────────");
     departments.length = 0;
     // Check what departments are in the database
     connection.query("SELECT * FROM manageEmployeesDB.department", function (err, res) {
@@ -194,6 +207,7 @@ const runAddRole = () => {
 
 // Function to run prompts needed to add employees
 const runAddEmployee = () => {
+    console.log("───────────────────────────────────────────────");
     roles.length = 0;
     employees.length = 0;
 
@@ -273,7 +287,8 @@ const runViewDept = () => {
     connection.query("SELECT * FROM manageEmployeesDB.department", function (err, res) {
         if (err) throw err;
 
-        console.table("------VIEWING ALL DEPARTMENTS------", res);
+        console.log("───────────────────────────────────────────────");
+        console.table("────────────VIEWING ALL DEPARTMENTS────────────", res);
 
         // Call function to re-run main inquirer prompts again at end
         runMain();
@@ -290,7 +305,8 @@ const runViewRole = () => {
             console.table("No Roles Created");
             runMain();
         } else {
-            console.table("------   VIEWING ALL ROLES   ------", res);
+            console.log("───────────────────────────────────────────────");
+            console.table("───────────────VIEWING ALL ROLES───────────────", res);
 
             // Call function to re-run main inquirer prompts again at end
             runMain();
@@ -307,7 +323,8 @@ const runViewEmployee = () => {
             console.table("No Employees Created");
             runMain();
         } else {
-            console.table("------   VIEWING ALL EMPLOYEES   ------", res);
+            console.log("───────────────────────────────────────────────");
+            console.table("──────────── VIEWING ALL EMPLOYEES ────────────", res);
 
             // Call function to re-run main inquirer prompts again at end
             runMain();
