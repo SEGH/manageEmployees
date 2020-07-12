@@ -104,6 +104,8 @@ const runMain = () => {
 
     connection.query("SELECT * FROM department", function (err, res) {
         if (res.length === 0) {
+            console.log("───────────────────────────────────────────────");
+            console.log("ADD AT LEAST ONE DEPARTMENT TO START DATABASE");
             runAddDept();
         }
         else {
@@ -144,7 +146,6 @@ const runMain = () => {
 const runAddDept = () => {
     console.log("───────────────────────────────────────────────");
     inquirer.prompt(departmentQuestions).then(deptRes => {
-        console.log(deptRes);
 
         // Query to check if department name is already in database
         connection.query("SELECT name FROM manageEmployeesDB.department WHERE name = ?", [deptRes.deptName], function (err, res) {
@@ -158,13 +159,16 @@ const runAddDept = () => {
                     },
                     function (err, res) {
                         if (err) throw err;
-                        console.log(res.affectedRows + " department added!");
+
+                        console.log("───────────────────────────────────────────────");
+                        console.log(deptRes.deptName + " department added with id " + res.insertId + "!");
 
                         // Call function to re-run main inquirer prompts again at end
                         runMain();
                     });
             } else {
                 // If so, return back to main menu
+                console.log("───────────────────────────────────────────────");
                 console.log("Department already exists!")
                 runMain();
             }
@@ -196,7 +200,8 @@ const runAddRole = () => {
 
                     }, function (err, res) {
                         if (err) throw err;
-                        console.log(res.affectedRows + " role created!");
+                        console.log("───────────────────────────────────────────────");
+                        console.log(roleRes.roleTitle + " role created with an id of " + res.insertId +  " in the " + roleRes.roleDept + " department!");
                         // Call function to re-run main inquirer prompts again at end
                         runMain();
                     });
@@ -216,6 +221,7 @@ const runAddEmployee = () => {
         if (err) throw err;
 
         if (res.length === 0) {
+            console.log("───────────────────────────────────────────────");
             console.log("You need to add a role first");
             runMain();
         } else {
@@ -248,7 +254,9 @@ const runAddEmployee = () => {
 
                                 }, function (err, res) {
                                     if (err) throw err;
-                                    console.log(res.affectedRows + " employee created!");
+
+                                    console.log("───────────────────────────────────────────────");
+                                    console.log(`${employeeRes.firstName} ${employeeRes.lastName} has been recorded with an id of ${res.insertId} and a role of ${employeeRes.employeeRole}!`);
                                     // Call function to re-run main inquirer prompts again at end
                                     runMain();
                                 });
@@ -269,7 +277,9 @@ const runAddEmployee = () => {
 
                                     }, function (err, res) {
                                         if (err) throw err;
-                                        console.log(res.affectedRows + " employee created!");
+
+                                        console.log("───────────────────────────────────────────────");
+                                        console.log(`${employeeRes.firstName} ${employeeRes.lastName} has been recorded with an id of ${res.insertId} and a role of ${employeeRes.employeeRole}!`);
                                         // Call function to re-run main inquirer prompts again at end
                                         runMain();
                                     });
@@ -302,6 +312,7 @@ const runViewRole = () => {
         if (err) throw err;
 
         if (res.length === 0) {
+            console.log("───────────────────────────────────────────────");
             console.table("No Roles Created");
             runMain();
         } else {
@@ -320,6 +331,7 @@ const runViewEmployee = () => {
         if (err) throw err;
 
         if (res.length === 0) {
+            console.log("───────────────────────────────────────────────");
             console.table("No Employees Created");
             runMain();
         } else {
@@ -341,6 +353,7 @@ const runUpdateEmployee = () => {
         if (err) throw err;
 
         if (res.length === 0) {
+            console.log("───────────────────────────────────────────────");
             console.log("There are no employees to update");
             runMain();
         } else {
@@ -380,7 +393,8 @@ const runUpdateEmployee = () => {
                         connection.query("UPDATE employee SET role_id = ? WHERE id = ?", [selectedRoleID, selectedID], function (err, res) {
                             if (err) throw err;
 
-                            console.log(res.affectedRows + " employee updated!");
+                            console.log("───────────────────────────────────────────────");
+                            console.log(`${selectedEmployee.fullName}'s role has been updated to a ${newRole.newRole}`);
                             runMain();
                         });
                     });
