@@ -80,6 +80,8 @@
   
   <img src="./assets/images/exit.png" width="280">
 
+  * See more usage descriptions in videos [one](https://drive.google.com/file/d/1lI9_niuCyodKCn8hVM2vfbJunTK877FQ/view?usp=sharing) and [two](https://drive.google.com/file/d/1lI9_niuCyodKCn8hVM2vfbJunTK877FQ/view?usp=sharing)
+
   ## License
   Licensed under the Unlicense license.
 
